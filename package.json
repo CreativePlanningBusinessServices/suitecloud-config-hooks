@@ -1,0 +1,15 @@
+{
+  "name": "suitecloud-config-hooks",
+  "version": "1.0.0",
+  "description": "Provides hooks to be run when using the SuiteCloud Developer Framework CLI or VSCode extension",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kyle Jones",
+  "license": "ISC",
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
