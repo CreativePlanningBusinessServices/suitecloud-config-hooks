@@ -1,7 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helloWorld = void 0;
-function helloWorld() {
-    console.log('hello world 🦊!');
-}
-exports.helloWorld = helloWorld;
+exports.organizeImportedObjects = void 0;
+const objectImport_1 = require("./src/objectImport");
+Object.defineProperty(exports, "organizeImportedObjects", { enumerable: true, get: function () { return objectImport_1.organizeImportedObjects; } });

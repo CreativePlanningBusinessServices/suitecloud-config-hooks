@@ -1,6 +1,3 @@
+import { organizeImportedObjects } from './src/objectImport';
 
-function helloWorld() {
-    console.log('hello world 🦊!');
-}
-
-export { helloWorld }
+export { organizeImportedObjects };

@@ -1,2 +1,2 @@
-declare function helloWorld(): void;
-export { helloWorld };
+import { organizeImportedObjects } from './src/objectImport';
+export { organizeImportedObjects };
