@@ -15,9 +15,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.organizeImportedObjects = void 0;
 const promises_1 = require("fs/promises");
+const path_1 = __importDefault(require("path"));
 function organizeImportedObjects(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const objectDirectoryPath = getObjectDirectoryPath(options);
@@ -30,13 +34,22 @@ function organizeImportedObjects(options) {
 exports.organizeImportedObjects = organizeImportedObjects;
 function moveFile(fileName, directoryPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const oldPath = `${directoryPath}/${fileName}`;
-        const newFolderPath = `${directoryPath}/${getFolderName(fileName)}`;
-        if (!(yield doesFolderExist(newFolderPath))) {
-            yield (0, promises_1.mkdir)(newFolderPath);
-        }
-        const newPath = `${newFolderPath}/${fileName}`;
+        const oldPath = directoryPath + path_1.default.sep + fileName;
+        const relativeFolderPath = getRelativeFolderPath(fileName);
+        const newFolderPath = directoryPath + path_1.default.sep + relativeFolderPath.join(path_1.default.sep);
+        yield createFolder(directoryPath, relativeFolderPath);
+        const newPath = newFolderPath + path_1.default.sep + fileName;
         (0, promises_1.rename)(oldPath, newPath);
+    });
+}
+function createFolder(directoryPath, relativeFolderPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const pathComponent of relativeFolderPath) {
+            directoryPath += path_1.default.sep + pathComponent;
+            if (!(yield doesFolderExist(directoryPath))) {
+                yield (0, promises_1.mkdir)(directoryPath);
+            }
+        }
     });
 }
 function doesFolderExist(directoryPath) {
@@ -49,9 +62,6 @@ function doesFolderExist(directoryPath) {
             return false;
         }
     });
-}
-function getFolderName(fileName) {
-    return 'Test'; //TODO:
 }
 function fetchUnorganizedFileNames(directoryPath) {
     var e_1, _a;
@@ -81,3 +91,14 @@ function getObjectDirectoryPath(options) {
     const destination = options._commandParameters.destinationfolder.replace(/"/g, '');
     return project + destination;
 }
+function getRelativeFolderPath(fileName) {
+    for (const [prefix, folderPath] of Object.entries(filePrefixFolderMap)) {
+        if (fileName.startsWith(prefix)) {
+            return folderPath;
+        }
+    }
+    throw new Error(`file name ${fileName} could not be resolved to a folder`);
+}
+const filePrefixFolderMap = {
+    custtmpl: ['Templates', 'AdvancedPDFs'],
+};
