@@ -1,9 +1,34 @@
-import { opendir } from 'fs/promises';
+import { access, mkdir, opendir, rename } from 'fs/promises';
 
 async function organizeImportedObjects(options: ObjectImportOptions): Promise<void> {
-  const objectDirectory = getObjectDirectory(options);
-  const fileNames = await fetchUnorganizedFileNames(objectDirectory);
-  console.log(fileNames);
+  const objectDirectoryPath = getObjectDirectoryPath(options);
+  const fileNames = await fetchUnorganizedFileNames(objectDirectoryPath);
+  for (const name of fileNames) {
+    await moveFile(name, objectDirectoryPath);
+  }
+}
+
+async function moveFile(fileName: string, directoryPath: string) {
+  const oldPath = `${directoryPath}/${fileName}`;
+  const newFolderPath = `${directoryPath}/${getFolderName(fileName)}`;
+  if (!(await doesFolderExist(newFolderPath))) {
+    await mkdir(newFolderPath);
+  }
+  const newPath = `${newFolderPath}/${fileName}`;
+  rename(oldPath, newPath);
+}
+
+async function doesFolderExist(directoryPath: string): Promise<boolean> {
+  try {
+    await access(directoryPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getFolderName(fileName: string): string {
+  return 'Test'; //TODO:
 }
 
 async function fetchUnorganizedFileNames(directoryPath: string): Promise<string[]> {
@@ -17,7 +42,7 @@ async function fetchUnorganizedFileNames(directoryPath: string): Promise<string[
   return fileNames;
 }
 
-function getObjectDirectory(options: ObjectImportOptions): string {
+function getObjectDirectoryPath(options: ObjectImportOptions): string {
   const project = options._commandParameters.project.replace(/"/g, '');
   const destination = options._commandParameters.destinationfolder.replace(/"/g, '');
   return project + destination;

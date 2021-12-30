@@ -20,12 +20,39 @@ exports.organizeImportedObjects = void 0;
 const promises_1 = require("fs/promises");
 function organizeImportedObjects(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const objectDirectory = getObjectDirectory(options);
-        const fileNames = yield fetchUnorganizedFileNames(objectDirectory);
-        console.log(fileNames);
+        const objectDirectoryPath = getObjectDirectoryPath(options);
+        const fileNames = yield fetchUnorganizedFileNames(objectDirectoryPath);
+        for (const name of fileNames) {
+            yield moveFile(name, objectDirectoryPath);
+        }
     });
 }
 exports.organizeImportedObjects = organizeImportedObjects;
+function moveFile(fileName, directoryPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const oldPath = `${directoryPath}/${fileName}`;
+        const newFolderPath = `${directoryPath}/${getFolderName(fileName)}`;
+        if (!(yield doesFolderExist(newFolderPath))) {
+            yield (0, promises_1.mkdir)(newFolderPath);
+        }
+        const newPath = `${newFolderPath}/${fileName}`;
+        (0, promises_1.rename)(oldPath, newPath);
+    });
+}
+function doesFolderExist(directoryPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield (0, promises_1.access)(directoryPath);
+            return true;
+        }
+        catch (_a) {
+            return false;
+        }
+    });
+}
+function getFolderName(fileName) {
+    return 'Test'; //TODO:
+}
 function fetchUnorganizedFileNames(directoryPath) {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -49,7 +76,7 @@ function fetchUnorganizedFileNames(directoryPath) {
         return fileNames;
     });
 }
-function getObjectDirectory(options) {
+function getObjectDirectoryPath(options) {
     const project = options._commandParameters.project.replace(/"/g, '');
     const destination = options._commandParameters.destinationfolder.replace(/"/g, '');
     return project + destination;
