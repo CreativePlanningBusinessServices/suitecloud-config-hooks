@@ -8,13 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,21 +18,35 @@ const path_1 = __importDefault(require("path"));
 function organizeImportedObjects(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const objectDirectoryPath = getObjectDirectoryPath(options);
-        const fileNames = yield fetchUnorganizedFileNames(objectDirectoryPath);
-        for (const name of fileNames) {
-            yield moveFile(name, objectDirectoryPath);
-        }
+        console.log(options._data.successfulImports);
+        yield moveImportedFiles(options, objectDirectoryPath);
     });
 }
 exports.organizeImportedObjects = organizeImportedObjects;
-function moveFile(fileName, directoryPath) {
+function moveImportedFiles(options, objectDirectoryPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const successfulImport of options._data.successfulImports) {
+            const { id, type } = successfulImport.customObject;
+            try {
+                if (type === 'advancedpdftemplate') {
+                    yield moveFile(id + '.template.xml', type, objectDirectoryPath);
+                }
+                yield moveFile(id + '.xml', type, objectDirectoryPath);
+            }
+            catch (err) {
+                console.error(err);
+            }
+        }
+    });
+}
+function moveFile(fileName, fileType, directoryPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const oldPath = directoryPath + path_1.default.sep + fileName;
-        const relativeFolderPath = getRelativeFolderPath(fileName);
+        const relativeFolderPath = getRelativeFolderPath(fileType);
         const newFolderPath = directoryPath + path_1.default.sep + relativeFolderPath.join(path_1.default.sep);
         yield createFolder(directoryPath, relativeFolderPath);
         const newPath = newFolderPath + path_1.default.sep + fileName;
-        (0, promises_1.rename)(oldPath, newPath);
+        yield (0, promises_1.rename)(oldPath, newPath);
     });
 }
 function createFolder(directoryPath, relativeFolderPath) {
@@ -63,42 +70,22 @@ function doesFolderExist(directoryPath) {
         }
     });
 }
-function fetchUnorganizedFileNames(directoryPath) {
-    var e_1, _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const fileNames = [];
-        const directory = yield (0, promises_1.opendir)(directoryPath);
-        try {
-            for (var directory_1 = __asyncValues(directory), directory_1_1; directory_1_1 = yield directory_1.next(), !directory_1_1.done;) {
-                const entry = directory_1_1.value;
-                if (entry.isFile()) {
-                    fileNames.push(entry.name);
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (directory_1_1 && !directory_1_1.done && (_a = directory_1.return)) yield _a.call(directory_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return fileNames;
-    });
-}
 function getObjectDirectoryPath(options) {
     const project = options._commandParameters.project.replace(/"/g, '');
     const destination = options._commandParameters.destinationfolder.replace(/"/g, '');
     return project + destination;
 }
-function getRelativeFolderPath(fileName) {
-    for (const [prefix, folderPath] of Object.entries(filePrefixFolderMap)) {
-        if (fileName.startsWith(prefix)) {
-            return folderPath;
-        }
+function getRelativeFolderPath(fileType) {
+    const path = filePrefixFolderMap[fileType];
+    if (!path) {
+        throw new Error(`file type ${fileType} could not be resolved to a folder`);
     }
-    throw new Error(`file name ${fileName} could not be resolved to a folder`);
+    return path;
 }
+// TODO:
 const filePrefixFolderMap = {
-    custtmpl: ['Templates', 'AdvancedPDFs'],
+    advancedpdftemplate: ['Templates', 'AdvancedPDFs'],
+    center: ['CentersAndTabs', 'Centers'],
+    custcentercategory: ['CentersAndTabs', 'Categories'],
+    custcentertab: ['CentersAndTabs', 'Tab'],
 };
