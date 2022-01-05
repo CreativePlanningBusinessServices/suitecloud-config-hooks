@@ -11,13 +11,20 @@ async function moveImportedFiles(options: ObjectImportOptions, objectDirectoryPa
   for (const successfulImport of options._data.successfulImports) {
     const { id, type } = successfulImport.customObject;
     try {
-      if (type === 'advancedpdftemplate') {
-        await moveFile(id + '.template.xml', type, objectDirectoryPath);
-      }
+      await handleSpecialObjectTypes(id, type, objectDirectoryPath);
       await moveFile(id + '.xml', type, objectDirectoryPath);
     } catch (err) {
       console.error(err);
     }
+  }
+}
+
+async function handleSpecialObjectTypes(id: string, type: string, objectDirectoryPath: string) {
+  if (type === 'advancedpdftemplate') {
+    await moveFile(id + '.template.xml', type, objectDirectoryPath);
+  }
+  if (type === 'emailtemplate') {
+    await moveFile(id + '.template.html', type, objectDirectoryPath);
   }
 }
 
@@ -62,12 +69,59 @@ function getRelativeFolderPath(fileType: string): string[] {
   return path;
 }
 
-// TODO:
 const filePrefixFolderMap: Record<string, string[]> = {
+  addressform: ['Forms', 'AddressForms'],
   advancedpdftemplate: ['Templates', 'AdvancedPDFs'],
+  bankstatementparserplugin: ['BankStatementParserPlugin'],
+  bundleinstallationscript: ['BundleInstallation'],
   center: ['CentersAndTabs', 'Centers'],
-  custcentercategory: ['CentersAndTabs', 'Categories'],
-  custcentertab: ['CentersAndTabs', 'Tab'],
+  centercategory: ['CentersAndTabs', 'Categories'],
+  centertab: ['CentersAndTabs', 'Tab'],
+  centerlink: ['CentersAndTabs', 'Links'],
+  clientscript: ['Scripts', 'Client'],
+  cmscontenttype: ['CMS', 'ContentType'],
+  crmcustomfield: ['Fields', 'CRM'],
+  customglplugin: ['Plugins', 'Custom'],
+  customlist: ['Lists'],
+  customrecordtype: ['Records'],
+  customsegment: ['CustomSegments'],
+  customtransactiontype: ['CustomTransactions'],
+  dataset: ['Dataset'],
+  emailcaptureplugin: ['Plugins', 'Email'],
+  emailtemplate: ['Templates', 'Email'],
+  entitycustomfield: ['Fields', 'Entity'],
+  entryForm: ['Forms', 'EntryForm'],
+  integration: ['Integrations'],
+  itemcustomfield: ['Fields', 'Item'],
+  itemnumbercustomfield: ['Fields', 'ItemNumber'],
+  itemoptioncustomfield: ['Fields', 'ItemOption'],
+  kpiscorecard: ['KPIScorecards'],
+  mapreducescript: ['Scripts', 'MapReduce'],
+  massupdatescript: ['Scripts', 'MassUpdate'],
+  othercustomfield: ['Fields', 'Other'],
+  pluginimplementation: ['PluginImplementations'],
+  plugintype: ['PluginTypes'],
+  portlet: ['Scripts', 'Portlet'],
+  promotionsplugin: ['Plugins', 'Promotions'],
+  publisheddashboard: ['PublishDashboards'],
+  restlet: ['Scripts', 'Restlet'],
+  role: ['Roles'],
+  csvimport: ['CSVImports'],
+  savedsearch: ['SavedSearches'],
+  scheduledscript: ['Scripts', 'Scheduled'],
+  sdfinstallationscript: ['Scripts', 'SDFInstallation'],
+  sspapplication: ['SSPApplications'],
+  sublist: ['Sublists'],
+  subtab: ['CentersAndTabs', 'SubTab'],
+  suitelet: ['Scripts', 'Suitelet'],
+  transactionForm: ['Forms', 'TransactionForm'],
+  transactionbodycustomfield: ['Fields', 'TransactionBody'],
+  transactioncolumncustomfield: ['Fields', 'TransactionColumn'],
+  translationcollection: ['TranslationCollection'],
+  usereventscript: ['Scripts', 'UserEvent'],
+  workbook: ['Workbooks'],
+  workflow: ['Workflows'],
+  workflowactionscript: ['Scripts', 'WorkflowAction'],
 };
 
 type ObjectImportOptions = {
