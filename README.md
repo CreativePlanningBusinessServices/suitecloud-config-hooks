@@ -5,7 +5,7 @@ Hooks into Node version of SuiteCloud Developer Framework CLI. These can be exec
 ## Example suitecloud.config.js
 
 ```js
-const hooks = require('./node_modules/suitecloud-config-hooks/dist/index');
+const hooks = require('suitecloud-config-hooks');
 
 module.exports = {
   commands: {
