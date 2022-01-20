@@ -1,6 +1,6 @@
 {
   "name": "suitecloud-config-hooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provides hooks to be run when using the SuiteCloud Developer Framework CLI or VSCode extension",
   "main": "dist/index.js",
   "scripts": {
@@ -11,6 +11,15 @@
   "files": [
     "dist",
     "README.md"
+  ],
+  "keywords": [
+    "suitescript",
+    "netsuite",
+    "suitecloud",
+    "extension",
+    "sdf",
+    "developer",
+    "framework"
   ],
   "devDependencies": {
     "@types/node": "^17.0.5",
