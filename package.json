@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Kyle Jones",
+  "author": "Kyle Jones <kylejoneswinsted@gmail.com>",
   "license": "ISC",
   "files": [
     "dist",
