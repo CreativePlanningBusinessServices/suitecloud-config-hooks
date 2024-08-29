@@ -11,7 +11,17 @@ module.exports = {
   commands: {
     'object:import': {
       onCompleted: hooks.organizeImportedObjects,
+    },
+    'project:deploy': {
+      beforeExecuting: async (options) => {
+        await hooks.preventDeployWithoutRemote(options);
+        if (hooks.isProd(options)) {
+          await hooks.preventDeployWithUncommittedChanges(options);
+        }
+        return options;
+      }
     }
   }
 }
+
 ```

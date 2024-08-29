@@ -1,2 +1,3 @@
 import { organizeImportedObjects } from './src/objectImport';
-export { organizeImportedObjects };
+import { isProd, preventDeployWithoutRemote, preventDeployWithUncommittedChanges } from './src/protectDeploy';
+export { organizeImportedObjects, preventDeployWithUncommittedChanges, preventDeployWithoutRemote, isProd };
